@@ -1,0 +1,6 @@
+{
+  "name": "TerraHarvest - Local Food & Vendor Portal",
+  "description": "Enterprise local vendor onboarding portal, real-time SKU inventory management, automated returns with shipping labels, delivery tracking, and Stripe payment gateway.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
