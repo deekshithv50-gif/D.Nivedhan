@@ -36,6 +36,23 @@
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
+    <script type="module">
+      setTimeout(function() {
+        if (!window.__TERRA_HARVEST_MOUNTED__) {
+          var s = document.createElement('script');
+          s.type = 'module';
+          s.crossOrigin = 'anonymous';
+          s.src = './assets/index.js';
+          document.body.appendChild(s);
+
+          var l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.crossOrigin = 'anonymous';
+          l.href = './assets/index.css';
+          document.head.appendChild(l);
+        }
+      }, 400);
+    </script>
   </body>
 </html>
 

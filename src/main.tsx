@@ -11,3 +11,6 @@ createRoot(document.getElementById('root')!).render(
     </ErrorBoundary>
   </StrictMode>,
 );
+
+(window as unknown as { __TERRA_HARVEST_MOUNTED__: boolean }).__TERRA_HARVEST_MOUNTED__ = true;
+
