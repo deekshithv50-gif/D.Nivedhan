@@ -103,28 +103,43 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+function safeStorageGet<T>(key: string, fallback: T): T {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return fallback;
+    const saved = localStorage.getItem(key);
+    if (!saved || saved === 'undefined' || saved === 'null') return fallback;
+    return JSON.parse(saved);
+  } catch {
+    return fallback;
+  }
+}
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Persistence with localStorage fallback (Karnataka versioned keys)
-  const [currentUser, setCurrentUser] = useState<User>(() => {
-    const saved = localStorage.getItem('th_ka_current_user');
-    return saved ? JSON.parse(saved) : INITIAL_USERS[0]; // Admin by default for full evaluation
-  });
+  const [currentUser, setCurrentUser] = useState<User>(() =>
+    safeStorageGet('th_ka_current_user', INITIAL_USERS[0])
+  );
 
-  const [vendors, setVendors] = useState<Vendor[]>(() => {
-    const saved = localStorage.getItem('th_ka_vendors');
-    return saved ? JSON.parse(saved) : INITIAL_VENDORS;
-  });
+  const [vendors, setVendors] = useState<Vendor[]>(() =>
+    safeStorageGet('th_ka_vendors', INITIAL_VENDORS)
+  );
 
   const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('th_ka_products');
-    if (!saved) return INITIAL_PRODUCTS;
     try {
+      if (typeof window === 'undefined' || !window.localStorage) return INITIAL_PRODUCTS;
+      const saved = localStorage.getItem('th_ka_products');
+      if (!saved || saved === 'undefined' || saved === 'null') return INITIAL_PRODUCTS;
       const parsed: Product[] = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return INITIAL_PRODUCTS;
       const existingIds = new Set(parsed.map((p) => p.id));
       const missing = INITIAL_PRODUCTS.filter((p) => !existingIds.has(p.id));
       if (missing.length > 0) {
         const merged = [...parsed, ...missing];
-        localStorage.setItem('th_ka_products', JSON.stringify(merged));
+        try {
+          localStorage.setItem('th_ka_products', JSON.stringify(merged));
+        } catch {
+          // ignore quota errors
+        }
         return merged;
       }
       return parsed;
@@ -133,30 +148,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem('th_ka_cart');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [cart, setCart] = useState<CartItem[]>(() =>
+    safeStorageGet('th_ka_cart', [])
+  );
 
-  const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('th_ka_orders');
-    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
-  });
+  const [orders, setOrders] = useState<Order[]>(() =>
+    safeStorageGet('th_ka_orders', INITIAL_ORDERS)
+  );
 
-  const [returns, setReturns] = useState<ReturnRequest[]>(() => {
-    const saved = localStorage.getItem('th_ka_returns');
-    return saved ? JSON.parse(saved) : INITIAL_RETURNS;
-  });
+  const [returns, setReturns] = useState<ReturnRequest[]>(() =>
+    safeStorageGet('th_ka_returns', INITIAL_RETURNS)
+  );
 
-  const [feedback, setFeedback] = useState<CustomerFeedback[]>(() => {
-    const saved = localStorage.getItem('th_ka_feedback');
-    return saved ? JSON.parse(saved) : INITIAL_FEEDBACK;
-  });
+  const [feedback, setFeedback] = useState<CustomerFeedback[]>(() =>
+    safeStorageGet('th_ka_feedback', INITIAL_FEEDBACK)
+  );
 
-  const [erpIntegrations, setErpIntegrations] = useState<ErpIntegration[]>(() => {
-    const saved = localStorage.getItem('th_ka_erp');
-    return saved ? JSON.parse(saved) : INITIAL_ERP_INTEGRATIONS;
-  });
+  const [erpIntegrations, setErpIntegrations] = useState<ErpIntegration[]>(() =>
+    safeStorageGet('th_ka_erp', INITIAL_ERP_INTEGRATIONS)
+  );
 
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -195,37 +205,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeDeliveryOrder, setActiveDeliveryOrder] = useState<Order | null>(null);
   const [viewingReturnLabel, setViewingReturnLabel] = useState<ReturnRequest | null>(null);
 
-  // Sync to localStorage
+  // Sync to localStorage safely
   useEffect(() => {
-    localStorage.setItem('th_ka_current_user', JSON.stringify(currentUser));
+    try {
+      localStorage.setItem('th_ka_current_user', JSON.stringify(currentUser));
+    } catch {}
   }, [currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('th_ka_vendors', JSON.stringify(vendors));
+    try {
+      localStorage.setItem('th_ka_vendors', JSON.stringify(vendors));
+    } catch {}
   }, [vendors]);
 
   useEffect(() => {
-    localStorage.setItem('th_ka_products', JSON.stringify(products));
+    try {
+      localStorage.setItem('th_ka_products', JSON.stringify(products));
+    } catch {}
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('th_ka_cart', JSON.stringify(cart));
+    try {
+      localStorage.setItem('th_ka_cart', JSON.stringify(cart));
+    } catch {}
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem('th_ka_orders', JSON.stringify(orders));
+    try {
+      localStorage.setItem('th_ka_orders', JSON.stringify(orders));
+    } catch {}
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('th_ka_returns', JSON.stringify(returns));
+    try {
+      localStorage.setItem('th_ka_returns', JSON.stringify(returns));
+    } catch {}
   }, [returns]);
 
   useEffect(() => {
-    localStorage.setItem('th_ka_feedback', JSON.stringify(feedback));
+    try {
+      localStorage.setItem('th_ka_feedback', JSON.stringify(feedback));
+    } catch {}
   }, [feedback]);
 
   useEffect(() => {
-    localStorage.setItem('th_ka_erp', JSON.stringify(erpIntegrations));
+    try {
+      localStorage.setItem('th_ka_erp', JSON.stringify(erpIntegrations));
+    } catch {}
   }, [erpIntegrations]);
 
   // Role switching
