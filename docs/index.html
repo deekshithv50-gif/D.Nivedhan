@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TerraHarvest - Local Food & Vendor Portal</title>
+    <meta name="description" content="Enterprise local vendor onboarding portal, real-time SKU inventory management, automated returns with shipping labels, delivery tracking, and Stripe payment gateway." />
+    <meta property="og:title" content="TerraHarvest - Local Food & Vendor Portal" />
+    <meta property="og:description" content="Enterprise local vendor onboarding portal, real-time SKU inventory management, automated returns with shipping labels, delivery tracking, and Stripe payment gateway." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+      // 1. Ensure trailing slash on GitHub Pages so relative assets load correctly
+      if (window.location.hostname.includes('github.io') && !window.location.pathname.endsWith('/') && !window.location.pathname.split('/').pop().includes('.')) {
+        window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+      }
+      // 2. If GitHub Pages serves from root instead of /docs or Actions, redirect to compiled /docs/
+      if (window.location.hostname.includes('github.io') && !window.location.pathname.includes('/docs/')) {
+        var base = window.location.pathname.replace(/\/+$/, '');
+        window.location.replace(base + '/docs/' + window.location.search + window.location.hash);
+      }
+    </script>
+    <script type="module" crossorigin src="./assets/index-Bpi6Slcn.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BRLs07OE.css">
+  </head>
+  <body class="bg-stone-50 text-stone-900 antialiased selection:bg-emerald-500 selection:text-white min-h-screen">
+    <div id="root">
+      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #064e3b 0%, #022c22 100%); color: #ecfdf5; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; padding: 24px; text-align: center;">
+        <div style="width: 80px; height: 80px; border-radius: 24px; background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.4);">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+          </svg>
+        </div>
+        <h1 style="font-size: 28px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.02em; color: #ffffff;">TerraHarvest Karnataka</h1>
+        <p style="font-size: 14px; color: #a7f3d0; margin: 0 0 24px 0; max-width: 360px; line-height: 1.5;">26 Verified Organic Growers • 60 Produce SKUs • Active 2–4°C Cold Chain</p>
+        <div style="width: 200px; height: 4px; background: rgba(255, 255, 255, 0.15); border-radius: 999px; overflow: hidden; position: relative;">
+          <div style="width: 60%; height: 100%; background: #34d399; border-radius: 999px; animation: thPulseLoader 1.2s ease-in-out infinite;"></div>
+        </div>
+        <div id="th-fallback-hint" style="margin-top: 24px; font-size: 12px; color: #6ee7b7; display: none;">
+          Taking longer than expected? <a href="./docs/" style="color: #ffffff; text-decoration: underline; font-weight: 600;">Click here to load compiled build</a>
+        </div>
+        <style>@keyframes thPulseLoader{0%{transform:translate(-100%)}to{transform:translate(250%)}}</style>
+        <script>
+          setTimeout(function() {
+            var el = document.getElementById('th-fallback-hint');
+            if (el) el.style.display = 'block';
+          }, 3500);
+        </script>
+      </div>
+    </div>
+  </body>
+</html>
+

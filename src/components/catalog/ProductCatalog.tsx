@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   SlidersHorizontal,
@@ -12,6 +12,10 @@ import {
   Info,
   Layers,
   ArrowRight,
+  Sparkles,
+  MapPin,
+  ThermometerSnowflake,
+  Zap,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Product } from '../../types';
@@ -22,6 +26,19 @@ interface ProductCatalogProps {
   onOpenSKUManager?: () => void;
 }
 
+const KARNATAKA_DISTRICTS = [
+  { id: 'All', label: 'All Karnataka', icon: '🏛️' },
+  { id: 'Mysuru', label: 'Mysuru', icon: '👑' },
+  { id: 'Kodagu', label: 'Kodagu / Coorg', icon: '☕' },
+  { id: 'Mandya', label: 'Mandya', icon: '🌾' },
+  { id: 'Chikmagalur', label: 'Chikmagalur', icon: '⛰️' },
+  { id: 'Sakleshpur', label: 'Sakleshpur', icon: '🌿' },
+  { id: 'Byadgi', label: 'Byadgi', icon: '🌶️' },
+  { id: 'Dharwad', label: 'Dharwad', icon: '🥛' },
+  { id: 'Ramanagara', label: 'Ramanagara', icon: '🥭' },
+  { id: 'Agumbe', label: 'Agumbe', icon: '🌧️' },
+];
+
 export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   selectedVendorId,
   onClearVendorFilter,
@@ -30,8 +47,18 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   const { products, vendors, addToCart, cart, setIsCartOpen, feedback } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedDistrict, setSelectedDistrict] = useState('All');
   const [selectedProductDetail, setSelectedProductDetail] = useState<Product | null>(null);
   const [addedAnimationId, setAddedAnimationId] = useState<string | null>(null);
+  const [telemetryTemp, setTelemetryTemp] = useState(3.1);
+  const [basketAdded, setBasketAdded] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTelemetryTemp(+(2.7 + Math.random() * 0.8).toFixed(1));
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
 
   const categories = useMemo(() => {
     const set = new Set(products.map((p) => p.category));
@@ -44,18 +71,35 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.vendorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.category.toLowerCase().includes(searchQuery.toLowerCase());
+        p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.origin && p.origin.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
       const matchesVendor = !selectedVendorId || p.vendorId === selectedVendorId;
-      return matchesSearch && matchesCat && matchesVendor;
+      const matchesDistrict =
+        selectedDistrict === 'All' ||
+        (p.origin && p.origin.toLowerCase().includes(selectedDistrict.toLowerCase())) ||
+        p.vendorName.toLowerCase().includes(selectedDistrict.toLowerCase());
+      return matchesSearch && matchesCat && matchesVendor && matchesDistrict;
     });
-  }, [products, searchQuery, selectedCategory, selectedVendorId]);
+  }, [products, searchQuery, selectedCategory, selectedVendorId, selectedDistrict]);
 
   const handleAddToCart = (product: Product, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     addToCart(product, 1);
     setAddedAnimationId(product.id);
     setTimeout(() => setAddedAnimationId(null), 1200);
+  };
+
+  const handleLoadHeritageBasket = () => {
+    const iconicKeywords = ['Rasabale', 'Pepper', 'Byadgi', 'Jaggery', 'Honey'];
+    const selectedItems = products.filter((p) =>
+      iconicKeywords.some((k) => p.name.toLowerCase().includes(k.toLowerCase()))
+    ).slice(0, 5);
+
+    selectedItems.forEach((item) => addToCart(item, 1));
+    setBasketAdded(true);
+    setTimeout(() => setBasketAdded(false), 2000);
+    setIsCartOpen(true);
   };
 
   const getCartQuantity = (productId: string) => {
@@ -69,35 +113,87 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   return (
     <div className="space-y-6">
       {/* Storefront Hero / Announcement */}
-      <div className="bg-gradient-to-br from-emerald-900 via-stone-900 to-emerald-950 text-white rounded-3xl p-6 sm:p-10 shadow-lg border border-emerald-800/40 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-emerald-950 via-stone-900 to-emerald-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-emerald-800/40 relative overflow-hidden">
         {/* Subtle decorative background organic shape */}
         <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-10 pointer-events-none flex items-center justify-end pr-8">
-          <span className="text-[180px]">🥬</span>
+          <span className="text-[180px]">🥭</span>
         </div>
 
-        <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 font-semibold tracking-wide">
-            <span>Direct Farm Cold-Chain Logistics</span>
-            <span>·</span>
-            <span>Harvested Daily</span>
+        <div className="relative z-10 max-w-3xl space-y-4">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold flex items-center gap-1.5">
+              <ThermometerSnowflake className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Active Telemetry: {telemetryTemp}°C (Optimal 2–4°C)</span>
+            </span>
+            <span className="text-emerald-400/60 hidden sm:inline">·</span>
+            <span className="text-stone-300">26 Certified Organic Farms</span>
+            <span className="text-emerald-400/60 hidden sm:inline">·</span>
+            <span className="text-stone-300">Bengaluru Cold Route</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold font-display tracking-tight leading-tight text-white">
-            Peak Harvest Local Produce & Artisanal Goods
+
+          <h1 className="text-3xl sm:text-5xl font-extrabold font-display tracking-tight leading-tight text-white">
+            Karnataka Heritage Harvest <br className="hidden sm:inline" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-200">
+              Direct From The Soil
+            </span>
           </h1>
-          <p className="text-sm text-stone-300 leading-relaxed">
-            Every crop tracked with individual SKU inventory, origin lot verification, and continuous cold-chain monitoring from local farms to your kitchen.
+
+          <p className="text-sm sm:text-base text-stone-300 leading-relaxed max-w-2xl">
+            60 certified farm products from Mysuru, Coorg, Mandya, Sakleshpur & Byadgi. Continuous cold-chain logistics ensures produce arrives fresh within hours of harvest.
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-stone-300">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{products.length} Monitored SKUs</span>
-            </div>
-            <span>·</span>
-            <div>2-4°C Active Cold Chain</div>
-            <span>·</span>
-            <div>Zero Synthetic Pesticides</div>
+          <div className="pt-2 flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleLoadHeritageBasket}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-950/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Sparkles className="w-4 h-4 text-amber-200 animate-spin" style={{ animationDuration: '4s' }} />
+              <span>{basketAdded ? '✓ Heritage Basket Loaded!' : '1-Click: Load Karnataka Heritage Basket'}</span>
+            </button>
+
+            <button
+              onClick={() => setSelectedDistrict('All')}
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-stone-200 text-xs font-semibold backdrop-blur-xs border border-white/10 transition-colors"
+            >
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              <span>Explore All 26 Karnataka Terroirs</span>
+            </button>
           </div>
+        </div>
+      </div>
+
+      {/* Terroir / District Quick Filter Chips */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs text-stone-500 font-mono">
+          <span className="font-semibold uppercase tracking-wider text-stone-700">Explore by Karnataka Growing District</span>
+          <span>{filteredProducts.length} items available</span>
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+          {KARNATAKA_DISTRICTS.map((dist) => {
+            const count = dist.id === 'All'
+              ? products.length
+              : products.filter(p => (p.origin && p.origin.toLowerCase().includes(dist.id.toLowerCase())) || p.vendorName.toLowerCase().includes(dist.id.toLowerCase())).length;
+
+            return (
+              <button
+                key={dist.id}
+                onClick={() => setSelectedDistrict(dist.id)}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
+                  selectedDistrict === dist.id
+                    ? 'bg-emerald-900 text-white border-emerald-900 shadow-xs scale-[1.02]'
+                    : 'bg-white text-stone-700 border-stone-200 hover:border-emerald-700 hover:bg-stone-50'
+                }`}
+              >
+                <span>{dist.icon}</span>
+                <span>{dist.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                  selectedDistrict === dist.id ? 'bg-emerald-800 text-emerald-200' : 'bg-stone-100 text-stone-500'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

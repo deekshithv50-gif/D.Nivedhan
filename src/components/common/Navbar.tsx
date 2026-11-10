@@ -12,8 +12,10 @@ import {
   BarChart3,
   Check,
   ExternalLink,
+  Github,
 } from 'lucide-react';
 import { TerraLogo } from './TerraLogo';
+import { GitHubDeploymentModal } from './GitHubDeploymentModal';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types';
 
@@ -40,6 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
+  const [showGitHubModal, setShowGitHubModal] = useState(false);
 
   const roles: { role: UserRole; title: string; desc: string }[] = [
     { role: 'admin', title: 'Super Admin', desc: 'Marketplace, approvals & financials' },
@@ -148,6 +151,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
 
         {/* Zone 3: Primary Actions */}
         <div className="flex items-center gap-2.5 shrink-0">
+          {/* GitHub Pages Deployment Helper */}
+          <button
+            onClick={() => setShowGitHubModal(true)}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors border border-stone-200"
+            title="GitHub Pages Deployment Guide & Setup"
+          >
+            <Github className="w-3.5 h-3.5 text-stone-900" />
+            <span className="font-mono text-[11px] hidden md:inline">Deploy Guide</span>
+          </button>
+
           {/* 1-800 Customer Support Hotline Trigger */}
           <button
             onClick={() => setIsHotlineOpen(true)}
@@ -364,6 +377,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           Java Code
         </button>
       </div>
+
+      {/* GitHub Pages Deployment Modal */}
+      <GitHubDeploymentModal
+        isOpen={showGitHubModal}
+        onClose={() => setShowGitHubModal(false)}
+      />
     </header>
   );
 };
